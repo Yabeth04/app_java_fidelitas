@@ -20,23 +20,23 @@ public class App_java_project {
 
             indice = Integer.parseInt(JOptionPane.showInputDialog("********* MENU *********\n"
                     + "1) Agregar\n2) Consultar\n3) Eliminar\n4) Cambiar Estado\n0) Salir"));
-
             switch (indice) {
                 case 1 -> {
-                    //FALTA HACER UN CONTROL QUE SI LOS DATOS ESTAN MAL
-                    //NO LOS AGREGE AL ARREGLO
-                    //SE PODRIA HACER EL DATOSQUISCKPASS DENTRO DE LA FUNCION
-                    //AGREGARQUIS
                     String datofil = JOptionPane.showInputDialog(null, "Ingrese el número del Filial");
 
                     String datocod = JOptionPane.showInputDialog(null, "Ingrese el número del Codigo");
 
-                    String datoplaca = JOptionPane.showInputDialog(null, "Ingrese el número de la placa");
+                    // Validación del código
+                    if (datocod.length() == 10 && datocod.substring(0, 3).equals("101")) {
+                        String datoplaca = JOptionPane.showInputDialog(null, "Ingrese el número de la placa");
 
-                    condomino.AgregarQuis(new DatosQuisckpass(datofil, datocod, datoplaca));
+                        // Solo agrega si el código es válido
+                        condomino.AgregarQuis(new DatosQuisckpass(datofil, datocod, datoplaca));
 
-                    JOptionPane.showMessageDialog(null, condomino.CantQuis());
-
+                        JOptionPane.showMessageDialog(null, "Código agregado. Total de quickpasses: " + condomino.CantQuis());
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Código no válido. Debe comenzar con '101' y tener 10 dígitos.");
+                    }
                 }
                 case 2 -> {
 
@@ -123,9 +123,16 @@ public class App_java_project {
                     //METODO ELIMINAR CON EL CODIGO
                     //DEBEN MOVERSE A OTRO ArrayList 
                 }
-                case 4 -> {
-                    //CAMBIAR ESTADO
 
+                case 4 -> {
+                    String codigoEstado = JOptionPane.showInputDialog("Ingrese el código para cambiar el estado:");
+                    boolean cambioExitoso = condomino.CambiarEstado(codigoEstado);
+                    if (cambioExitoso) {
+                        JOptionPane.showMessageDialog(null, "Estado cambiado exitosamente.");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se encontró el Quisckpass con ese código.");
+                    }
+                    //CAMBIAR ESTADO
                     //VERIFICA QUE SI EXISTA EL QUISCKPASS
                     //PERMITE CAMBIAR EL ESTADO DEL QUISCKPASS
                 }
