@@ -11,7 +11,7 @@ public class DatosQuisckpass {
     private String filial;
     private String codigo;
     private String placa;
-    private Estado estado = Estado.Activo;
+    private Estado estado = Estado.Activo; // Estado por defecto es Activo.
 
     public DatosQuisckpass(String pFilial, String pCodigo, String pPlaca) {
         this.setFilial(pFilial);
@@ -20,11 +20,24 @@ public class DatosQuisckpass {
         this.getEstado();
     }
 
-
+    //OBTENER DATOS
     public String getFilial() {
         return filial;
     }
 
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    //MODIFICAR DATOS
     public void setFilial(String pFilial) {
         if (pFilial.length() > 0) {
             filial = pFilial;
@@ -33,33 +46,21 @@ public class DatosQuisckpass {
         }
     }
 
-    public String getCodigo() {
-        return codigo;
-    }
-
     public void setCodigo(String pCodigo) {
-        if (pCodigo.startsWith("101")) {
-            if (pCodigo.length() == 10) {
-                codigo = pCodigo;
+        if (pCodigo.length() == 10 && pCodigo.substring(0, 3).equals("101")) {
+            codigo = pCodigo;
 
-            } else {
-                JOptionPane.showMessageDialog(null, "Error del tamaño del Codigo");
-            }
         } else {
-            JOptionPane.showMessageDialog(null, "Error el codigo no comienza en 101");
+            JOptionPane.showMessageDialog(null, "Código no válido. Debe comenzar con '101' y tener 10 dígitos.");
         }
     }
 
-    public String getPlaca(){
-    return placa;
+    public String setPlaca(String pPlaca) {
+        return placa = pPlaca;
     }
-    
-    public String setPlaca(String pPlaca){
-    return placa = pPlaca;
-    }
-    
-    public Estado getEstado() {
-        return estado;
+
+    public void setEstado(Estado pEstado) {
+        this.estado = pEstado;
     }
 
     /**
@@ -67,7 +68,7 @@ public class DatosQuisckpass {
      * @return
      */
     @Override
-    public String toString(){
-    return "Filial: "+ filial + "\nCodigo: " + codigo + "\nPlaca: " + placa + "\nEstado: " + estado;
+    public String toString() {
+        return "Filial: " + filial + "\nCodigo: " + codigo + "\nPlaca: " + placa + "\nEstado: " + estado;
     }
 }
