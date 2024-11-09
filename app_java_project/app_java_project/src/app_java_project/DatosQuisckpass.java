@@ -8,67 +8,182 @@ import javax.swing.JOptionPane;
  */
 public class DatosQuisckpass {
 
-    private String filial;
-    private String codigo;
-    private String placa;
-    private Estado estado = Estado.Activo; // Estado por defecto es Activo.
+    int Size = 10;
+//    private String ArrayQuis[] = new String[Size];
+    private String ArrayQuis[][] = new String[Size][4];
 
-    public DatosQuisckpass(String pFilial, String pCodigo, String pPlaca) {
-        this.setFilial(pFilial);
-        this.setCodigo(pCodigo);
-        this.setPlaca(pPlaca);
+    private String filial = null;
+    private String codigo = null;
+    private String placa = null;
+    private Estado estado = Estado.Activo;
+
+    public DatosQuisckpass() {
+    }
+
+    public DatosQuisckpass(String nulo) {
+        this.setFilial();
+        this.setCodigo();
+        this.setPlaca();
         this.getEstado();
     }
 
-    //OBTENER DATOS
     public String getFilial() {
         return filial;
+    }
+
+    public void setFilial() {
+        boolean bandera = true;
+
+        while (bandera) {
+            String pFilial = JOptionPane.showInputDialog(null, "Ingrese el número del Filial");
+            if (pFilial.length() > 0) {
+                filial = pFilial;
+                bandera = false;
+            } else {
+                JOptionPane.showMessageDialog(null, "Error del tamaño del Filial");
+            }
+        }
     }
 
     public String getCodigo() {
         return codigo;
     }
 
+    public void setCodigo() {
+        boolean bandera = true;
+
+        while (bandera) {
+            String pCodigo = JOptionPane.showInputDialog(null, "Ingrese el número del codigo");
+            if (pCodigo.startsWith("101")) {
+                if (pCodigo.length() == 10) {
+                    codigo = pCodigo;
+                    bandera = false;
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error del tamaño del Codigo");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Error el codigo no comienza en 101");
+            }
+        }
+    }
+
     public String getPlaca() {
         return placa;
+    }
+
+    public void setPlaca() {
+        boolean bandera = true;
+
+        while (bandera) {
+            String pPlaca = JOptionPane.showInputDialog(null, "Ingrese el número de la placa");
+            if (pPlaca.length() > 0) {
+                placa = pPlaca;
+                bandera = false;
+            } else {
+                JOptionPane.showMessageDialog(null, "Error del tamaño de la placa");
+            }
+        }
     }
 
     public Estado getEstado() {
         return estado;
     }
 
-    //MODIFICAR DATOS
-    public void setFilial(String pFilial) {
-        if (pFilial.length() > 0) {
-            filial = pFilial;
-        } else {
-            JOptionPane.showMessageDialog(null, "Error del tamaño del Filial");
+//    public String Datos() {
+//        return "Filial: " + filial + "\nCodigo: " + codigo + "\nPlaca: " + placa + "\nEstado: " + estado + "\n";
+//    }
+    public void AgregarQuis() {
+        int limite = 0;
+
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            for (int j = 0; j < ArrayQuis[i].length; j++) {
+                if (ArrayQuis[i][j] == null && limite < 4) {
+                    switch (j) {
+                        case 0 -> {
+                            ArrayQuis[i][j] = filial;
+                        }
+                        case 1 -> {
+                            ArrayQuis[i][j] = codigo;
+                        }
+                        case 2 -> {
+                            ArrayQuis[i][j] = placa;
+                        }
+                        case 3 -> {
+                            ArrayQuis[i][j] = "" + estado;
+                        }
+                    }
+                    limite += 1;
+                }
+            }
         }
     }
 
-    public void setCodigo(String pCodigo) {
-        if (pCodigo.length() == 10 && pCodigo.substring(0, 3).equals("101")) {
-            codigo = pCodigo;
-
-        } else {
-            JOptionPane.showMessageDialog(null, "Código no válido. Debe comenzar con '101' y tener 10 dígitos.");
+    //CONSULTAR
+    //TODOS LOS DATOS
+    public String MostrarQuis() {
+        String Res = "";
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            for (int j = 0; j < ArrayQuis[i].length; j++) {
+                if (ArrayQuis[i][j] != null) {
+                    switch (j) {
+                        case 0 -> {
+                            Res += "Filial: " + ArrayQuis[i][j];
+                        }
+                        case 1 -> {
+                            Res += ", Codigo: " + ArrayQuis[i][j];
+                        }
+                        case 2 -> {
+                            Res += ", Placa: " + ArrayQuis[i][j];
+                        }
+                        case 3 -> {
+                            Res += ", Estado: " + ArrayQuis[i][j] + "\n";
+                        }
+                    }
+                }
+            }
         }
+        return Res;
     }
 
-    public String setPlaca(String pPlaca) {
-        return placa = pPlaca;
+    //LOS DE UNA FILIAL
+    public String MostrarFilial(String pConsulta) {
+        String Res = "";
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            for (int j = 0; j < ArrayQuis[i].length; j++) {
+                if (ArrayQuis[i][j] != null) {
+                    if (pConsulta.equals(ArrayQuis[i][j])) {
+                        Res += "Filial: " + ArrayQuis[i][0];
+                        Res += ", Codigo: " + ArrayQuis[i][1];
+                        Res += ", Placa: " + ArrayQuis[i][2];
+                        Res += ", Estado: " + ArrayQuis[i][3] + "\n";
+                    }
+                }
+            }
+        }
+        return Res;
     }
 
-    public void setEstado(Estado pEstado) {
-        this.estado = pEstado;
+    
+    
+    
+    
+    //CAMBIAR ESTADO
+    public boolean CambiarEstado(String pCodigo) {
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            for (int j = 0; j < ArrayQuis[i].length; j++) {
+                if (pCodigo.equals(ArrayQuis[i][j])) {
+                    if (ArrayQuis[i][3].equals("" + Estado.Activo)) {
+                        ArrayQuis[i][3] = "" + Estado.Inactivo;
+                    } else {
+                        ArrayQuis[i][3] = "" + Estado.Activo;
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
-    public String toString() {
-        return "Filial: " + filial + "\nCodigo: " + codigo + "\nPlaca: " + placa + "\nEstado: " + estado;
-    }
+    
 }
