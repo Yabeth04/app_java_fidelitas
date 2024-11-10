@@ -12,19 +12,19 @@ public class App_java_project {
         // INICIO MAIN
         DatosQuisckpass condomino = new DatosQuisckpass();
 
-        int indice = 0;
+        int opcionMenuPrincipal = 0;
 
         do {
+            opcionMenuPrincipal = Integer.parseInt(JOptionPane.showInputDialog(
+                    "------BIENVENIDO------\n---- Menu Principal ----\n"
+                    + "1) Agregar\n2) Consultar\n3) Eliminar\n4) Cambiar Estado\n5) Salir"));
 
-            indice = Integer.parseInt(JOptionPane.showInputDialog("********* MENU *********\n"
-                    + "1) Agregar\n2) Consultar\n3) Eliminar\n4) Cambiar Estado\n0) Salir"));
-
-            switch (indice) {
+            switch (opcionMenuPrincipal) {
                 case 1 -> {
                     //FALTA ARREGLAR EL SETPLACA 
                     //HAY QUE PONERLE RESTRICCIONES
                     condomino.setFilial();
-                    
+
                     condomino.setCodigo();
 
                     condomino.setPlaca();
@@ -33,38 +33,39 @@ public class App_java_project {
 
                 }
                 case 2 -> {
+                    int opcionMenuConsultar = 0;
+                    int opcionSubMenuConsultar = 0;
 
-                    int indice2 = 0; //MENU SECUNDARIO
-                    int indice3 = 0; //SUBMENU SECUNDARIO
-                    
-                    indice2 = Integer.parseInt(JOptionPane.showInputDialog("********* MENU *********\n"
+                    opcionMenuConsultar = Integer.parseInt(JOptionPane.showInputDialog(
+                            "********* MENU CONSULTAR *********\n"
                             + "1) Visualizar Datos\n2) Visualizar Datos Eliminados\n0) Salir"));
 
-                    switch (indice2) {
+                    switch (opcionMenuConsultar) {
                         case 1 -> {
-                            //VISUALIZAR DATOS
-                            indice3 = Integer.parseInt(JOptionPane.showInputDialog("********* VISUALIZAR DATOS *********\n"
+                            opcionSubMenuConsultar = Integer.parseInt(JOptionPane.showInputDialog(
+                                    "********* VISUALIZAR DATOS *********\n"
                                     + "1) Todos los datos \n2) Los de una filial \n3) Uno en especifico \n0) Salir"));
-
-                            switch (indice3) {
+                            String consultaNumeroFilial = "";
+                            switch (opcionSubMenuConsultar) {
                                 case 1 -> {
                                     //MOSTRAR TODOS LOS DATOS
-                                    JOptionPane.showMessageDialog(null, condomino.MostrarQuis() );
-
+                                    JOptionPane.showMessageDialog(null, condomino.MostrarQuis());
                                 }
                                 case 2 -> {
                                     //MOSTRAR LOS DATOS DE UNA FILIAL
-                                    String consulta = JOptionPane.showInputDialog(null, "Ingrese el número de la filial");
-                                    
-                                     JOptionPane.showMessageDialog(null, condomino.MostrarFilial(consulta) );
+                                    consultaNumeroFilial = JOptionPane.showInputDialog(null, "Ingrese el número de la filial");
+                                    JOptionPane.showMessageDialog(null, condomino.MostrarFilial(consultaNumeroFilial));
 
                                 }
                                 case 3 -> {
                                     //MOSTRAR LOS DATOS DE UNO EN ESPECIFICO
-
+                                    consultaNumeroFilial = JOptionPane.showInputDialog(
+                                            null, "Ingrese el número de la filial o el código");
+                                    String resultadoBusqueda = condomino.MostrarUnoEspecifico(consultaNumeroFilial);
+                                    JOptionPane.showMessageDialog(null, resultadoBusqueda);
                                 }
                                 case 0 -> {
-
+                                    //SALIR
                                 }
                                 default ->
                                     JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
@@ -73,10 +74,11 @@ public class App_java_project {
                         }
                         case 2 -> {
                             //VISUALIZAR DATOS ELIMINADOS
-                            indice3 = Integer.parseInt(JOptionPane.showInputDialog("********* VISUALIZAR DATOS ELIMINADOS *********\n"
+                            opcionSubMenuConsultar = Integer.parseInt(JOptionPane.showInputDialog(
+                                    "********* VISUALIZAR DATOS ELIMINADOS *********\n"
                                     + "1) Todos los datos \n2) Los de una filial \n3) Uno en especifico \n0) Salir"));
 
-                            switch (indice3) {
+                            switch (opcionSubMenuConsultar) {
                                 case 1 -> {
                                     //MOSTRAR TODOS LOS DATOS
 
@@ -90,12 +92,11 @@ public class App_java_project {
 
                                 }
                                 case 0 -> {
-
+                                    break;
                                 }
                                 default ->
                                     JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
                             }
-
                         }
                         case 0 -> {
 
@@ -104,32 +105,60 @@ public class App_java_project {
                             JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
                     }
 
-
                     //EN LAS DOS FORMAS DEBE BUSCAR PRIMERO QUE SI EXISTA EL OBJETO
                     //CREAR METODOS
                 }
                 case 3 -> {
                     //ELIMINAR
 
+                    int opcionMenuEliminar = Integer.parseInt(JOptionPane.showInputDialog(
+                            "****** MENU ELIMINAR ******\n1) Eliminar Placa\n2)Eliminar Codigo\n3) Salir"));
+                    switch (opcionMenuEliminar) {
+                        case 1 -> {
+                            // Eliminar placa
+                            String placaEliminar = JOptionPane.showInputDialog(null, "Ingrese la placa a eliminar");
+                            boolean eliminado = condomino.EliminarPorPlaca(placaEliminar);
+                            if (eliminado) {
+                                JOptionPane.showMessageDialog(null, "Placa eliminada con éxito.");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Placa no encontrada.");
+                            }
+                        }
+                        case 2 -> {
+                            // Eliminar placa
+                            String placaEliminar = JOptionPane.showInputDialog(null, "Ingrese el codigo a eliminar");
+                            boolean eliminado = condomino.EliminarPorPlaca(placaEliminar);
+                            if (eliminado) {
+                                JOptionPane.showMessageDialog(null, "Codgio eliminada con éxito.");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Codigo no encontrado.");
+                            }
+                        }
+                        case 3 -> {
+                            //SALIR
+                        }
+                        default ->
+                            JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
+                    }
                     //HACER UN SUBMENU PARA LAS DOS FORMAS DE ELIMINAR
                     //METODO ELIMINAR CON LA PLACA
                     //METODO ELIMINAR CON EL CODIGO
                     //DEBEN MOVERSE A OTRO ARRAY
                 }
                 case 4 -> {
-                     //CAMBIAR ESTADO
-                     String codigoEstado = JOptionPane.showInputDialog("Ingrese el código para cambiar el estado:");
-                     
-                     boolean cambioExitoso = condomino.CambiarEstado(codigoEstado);
-                     
-                     if (cambioExitoso) {
+                    //CAMBIAR ESTADO
+                    String codigoEstado = JOptionPane.showInputDialog("Ingrese el código para cambiar el estado:");
+
+                    boolean cambioExitoso = condomino.CambiarEstado(codigoEstado);
+
+                    if (cambioExitoso) {
                         JOptionPane.showMessageDialog(null, "Estado cambiado exitosamente.");
                     } else {
                         JOptionPane.showMessageDialog(null, "No se encontró el Quisckpass con ese código.");
                     }
-                     
                 }
-                case 0 -> {
+                case 5 -> {
+                    break;
                 }
 
                 default ->
@@ -137,7 +166,7 @@ public class App_java_project {
 
             }//FIN SWITCH
 
-        } while (indice != 0);
+        } while (opcionMenuPrincipal != 5);
 
         //FIN MAIN
     }

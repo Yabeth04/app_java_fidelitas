@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 public class DatosQuisckpass {
 
     int Size = 10;
-//    private String ArrayQuis[] = new String[Size];
+    private String ArrayEliminados[][] = new String[Size][4];
     private String ArrayQuis[][] = new String[Size][4];
 
     private String filial = null;
@@ -31,6 +31,35 @@ public class DatosQuisckpass {
         return filial;
     }
 
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    //CAMBIAR ESTADO
+    public boolean CambiarEstado(String pCodigo) {
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            for (int j = 0; j < ArrayQuis[i].length; j++) {
+                if (pCodigo.equals(ArrayQuis[i][j])) {
+                    if (ArrayQuis[i][3].equals("" + Estado.Activo)) {
+                        ArrayQuis[i][3] = "" + Estado.Inactivo;
+                    } else {
+                        ArrayQuis[i][3] = "" + Estado.Activo;
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void setFilial() {
         boolean bandera = true;
 
@@ -43,10 +72,6 @@ public class DatosQuisckpass {
                 JOptionPane.showMessageDialog(null, "Error del tamaño del Filial");
             }
         }
-    }
-
-    public String getCodigo() {
-        return codigo;
     }
 
     public void setCodigo() {
@@ -68,10 +93,6 @@ public class DatosQuisckpass {
         }
     }
 
-    public String getPlaca() {
-        return placa;
-    }
-
     public void setPlaca() {
         boolean bandera = true;
 
@@ -86,13 +107,7 @@ public class DatosQuisckpass {
         }
     }
 
-    public Estado getEstado() {
-        return estado;
-    }
-
-//    public String Datos() {
-//        return "Filial: " + filial + "\nCodigo: " + codigo + "\nPlaca: " + placa + "\nEstado: " + estado + "\n";
-//    }
+    // AGREGAR / INGRESAR CODIGO,FILIAL Y PLACA
     public void AgregarQuis() {
         int limite = 0;
 
@@ -119,7 +134,7 @@ public class DatosQuisckpass {
         }
     }
 
-    //CONSULTAR
+    // OPCION CONSULTAR
     //TODOS LOS DATOS
     public String MostrarQuis() {
         String Res = "";
@@ -164,26 +179,80 @@ public class DatosQuisckpass {
         return Res;
     }
 
-    
-    
-    
-    
-    //CAMBIAR ESTADO
-    public boolean CambiarEstado(String pCodigo) {
+    //MOSTRAR UNO EN ESPECIFICO
+    public String MostrarUnoEspecifico(String pConsulta) {
+        String Res = "";
         for (int i = 0; i < ArrayQuis.length; i++) {
             for (int j = 0; j < ArrayQuis[i].length; j++) {
-                if (pCodigo.equals(ArrayQuis[i][j])) {
-                    if (ArrayQuis[i][3].equals("" + Estado.Activo)) {
-                        ArrayQuis[i][3] = "" + Estado.Inactivo;
-                    } else {
-                        ArrayQuis[i][3] = "" + Estado.Activo;
+                if (ArrayQuis[i][j] != null) {
+                    // Buscar por código (o placa, depende de la entrada)
+                    if (pConsulta.equals(ArrayQuis[i][1])) {  // 1 es el índice para el código
+                        Res += "Filial: " + ArrayQuis[i][0];
+                        Res += ", Codigo: " + ArrayQuis[i][1];
+                        Res += ", Placa: " + ArrayQuis[i][2];
+                        Res += ", Estado: " + ArrayQuis[i][3] + "\n";
+                        return Res; // Devolver solo el primer resultado encontrado
                     }
-                    return true;
                 }
             }
         }
-        return false;
+        return "No se encontró el código/placa especificado.";
     }
 
-    
+    //ELIMINAR 
+    //ELIMINAR PLACA 
+    public boolean EliminarPorPlaca(String placa) {
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            if (ArrayQuis[i][2] != null && ArrayQuis[i][2].equals(placa)) {
+                // busqueda de la placa, se "copia" a ArrayEliminados
+                for (int j = 0; j < ArrayEliminados.length; j++) {
+                    // se busca la primera fila vacía en ArrayEliminados para agregarse
+                    if (ArrayEliminados[j][0] == null) {
+                        ArrayEliminados[j][0] = ArrayQuis[i][0];
+                        ArrayEliminados[j][1] = ArrayQuis[i][1];
+                        ArrayEliminados[j][2] = ArrayQuis[i][2];
+                        ArrayEliminados[j][3] = ArrayQuis[i][3];
+                        break;  // se termina de "copiar" y sale del loop
+                    }
+                }
+
+                //  elimina la placa de arrayquis
+                ArrayQuis[i][0] = null;
+                ArrayQuis[i][1] = null;
+                ArrayQuis[i][2] = null;
+                ArrayQuis[i][3] = null;
+
+                return true;  // La placa eliminada-
+            }
+        }
+        return false;  // La placa existe
+    }
+
+    // ELIMINAR POR CÓDIGO
+    public boolean EliminarPorCodigo(String codigo) {
+        for (int i = 0; i < ArrayQuis.length; i++) {
+            if (ArrayQuis[i][1] != null && ArrayQuis[i][1].equals(codigo)) {
+                // busqueda del código, se "copia" a ArrayEliminados
+                for (int j = 0; j < ArrayEliminados.length; j++) {
+                    // se busca la primera fila vacía en ArrayEliminados para agregarse
+                    if (ArrayEliminados[j][0] == null) {
+                        ArrayEliminados[j][0] = ArrayQuis[i][0];
+                        ArrayEliminados[j][1] = ArrayQuis[i][1];
+                        ArrayEliminados[j][2] = ArrayQuis[i][2];
+                        ArrayEliminados[j][3] = ArrayQuis[i][3];
+                        break;  // se termina de "copiar" y sale del loop
+                    }
+                }
+
+                // elimina el código de ArrayQuis
+                ArrayQuis[i][0] = null;
+                ArrayQuis[i][1] = null;
+                ArrayQuis[i][2] = null;
+                ArrayQuis[i][3] = null;
+
+                return true;  // el coodigo eliminado
+            }
+        }
+        return false; //la placa si existe
+    }
 }
