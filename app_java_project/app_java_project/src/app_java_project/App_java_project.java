@@ -127,7 +127,7 @@ public class App_java_project {
                         case 2 -> {
                             // Eliminar placa
                             String placaEliminar = JOptionPane.showInputDialog(null, "Ingrese el codigo a eliminar");
-                            boolean eliminado = condomino.EliminarPorPlaca(placaEliminar);
+                            boolean eliminado = condomino.EliminarPorCodigo(placaEliminar);
                             if (eliminado) {
                                 JOptionPane.showMessageDialog(null, "Codgio eliminada con éxito.");
                             } else {
