@@ -14,15 +14,13 @@ public class App_java_project {
         int indice = 0;
 
         do {
-
             indice = Integer.parseInt(JOptionPane.showInputDialog("********* MENU *********\n"
-                    + "1) Agregar\n2) Consultar\n3) Eliminar\n4) Cambiar Estado\n5) Salir"));
+                    + "1) Agregar\n2) Consultar\n3) Eliminar\n4) Cambiar Estado\n5) Generar Txt\n6) Salir"));
 
             switch (indice) {
                 case 1 -> {
                     CC.AgregarQuis(new DatosQuisckpass());
                 } //FALTA ARREGLAR EL SETPLACA  //HAY QUE PONERLE RESTRICCIONES
-
                 case 2 -> {
                     int indice2 = 0; //MENU SECUNDARIO
                     int indice3 = 0; //SUBMENU SECUNDARIO           
@@ -111,7 +109,6 @@ public class App_java_project {
                             JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
                     }
                 }
-
                 case 4 -> {
                     //CAMBIAR ESTADO
                     String codigoEstado = JOptionPane.showInputDialog("Ingrese el código para cambiar el estado:");
@@ -125,11 +122,14 @@ public class App_java_project {
                     }
                 }
                 case 5 -> {
+                    CC.GenerarTxt();
+                }
+                case 6 -> {
                     /*SALIR*/ }
                 default ->
                     JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
             }//FIN SWITCH
-        } while (indice != 5);
+        } while (indice != 6);
         //FIN MAIN
     }
 }

@@ -2,6 +2,7 @@ package app_java_project;
 
 import javax.swing.JOptionPane;
 
+
 /**
  *
  * @author samue
@@ -47,16 +48,16 @@ public final class DatosQuisckpass {
 
         while (bandera) {
             String pCodigo = JOptionPane.showInputDialog(null, "Ingrese el número del codigo");
-            if (pCodigo.startsWith("101")) {
-                if (pCodigo.length() == 10) {
+            if (pCodigo.length() == 10) {
+                if (pCodigo.substring(0, 3).equals("101")) {
                     codigo = pCodigo;
                     bandera = false;
 
                 } else {
-                    JOptionPane.showMessageDialog(null, "Error del tamaño del Codigo");
+                    JOptionPane.showMessageDialog(null, "Error el codigo no comienza en 101");
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Error el codigo no comienza en 101");
+                JOptionPane.showMessageDialog(null, "Error del tamaño del Codigo");
             }
         }
     }
@@ -82,7 +83,7 @@ public final class DatosQuisckpass {
     public Estado getEstado() {
         return estado;
     }
-    
+
     public Estado setEstado(Estado pEstado) {
         return this.estado = pEstado;
     }

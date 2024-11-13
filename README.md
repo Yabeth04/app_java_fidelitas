@@ -1,4 +1,4 @@
-Numero de grupo: 4
+Numero de grupo: 6
 Participantes:
 MALEAÑO BARAHONA EDUARD SAMUEL,
 MAIRENA SALAS ALLAN DAVID,
