@@ -7,7 +7,6 @@ import javax.swing.JOptionPane;
  * @author samue
  */
 public class App_java_project {
-
     public static void main(String[] args) {
         // INICIO MAIN
         ControlCondominio CC = new ControlCondominio(5);
@@ -20,7 +19,7 @@ public class App_java_project {
             switch (indice) {
                 case 1 -> {
                     CC.AgregarQuis(new DatosQuisckpass());
-                } //FALTA ARREGLAR EL SETPLACA  //HAY QUE PONERLE RESTRICCIONES
+                } 
                 case 2 -> {
                     int indice2 = 0; //MENU SECUNDARIO
                     int indice3 = 0; //SUBMENU SECUNDARIO           

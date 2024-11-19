@@ -23,6 +23,8 @@ public class ControlCondominio {
         this.espacioEliminado = size;
     }
 
+
+
     public void AgregarQuis(DatosQuisckpass DQ) {
         if (espacio > 0) {
             for (int i = 0; i < listaQuis.length; i++) {
@@ -199,38 +201,44 @@ public class ControlCondominio {
         return "Rechazado"; // No se encontró el código en la lista
     }
 
-    public void GenerarTxt() throws IOException {
-        Path archivo = Paths.get("ListaQuisckpass.txt");
+    public void GenerarTxt() {
+        try {
+            Path archivo = Paths.get("ListaQuisckpass.txt");
 
-        // Validar si la lista es null o está vacía
-        if (listaQuis == null || listaQuis.length == 0) {
-            JOptionPane.showMessageDialog(null, "Lista vacía.");
-            return;  // Salir si la lista está vacía o es null
-        }
-
-        // Crear una lista de líneas para escribir en el archivo
-        List<String> lines = new ArrayList<>();
-
-        // Recorrer la lista y agregar las líneas de los objetos no null
-        for (DatosQuisckpass quisckpass : listaQuis) {
-            if (quisckpass != null) {
-                String linea = "Codigo: " + quisckpass.getCodigo() + "; Placa: " + quisckpass.getPlaca()
-                        + "; Filial: " + quisckpass.getFilial() + " ; Estado: " + quisckpass.getEstado()
-                        + " ; Fecha: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date());
-                lines.add(linea);  // Agregar la línea a la lista
+            // Validar si la lista es null o está vacía
+            if (listaQuis == null || listaQuis.length == 0) {
+                JOptionPane.showMessageDialog(null, "Lista vacía.");
+                return;  // Salir si la lista está vacía o es null
             }
+
+            // Crear una lista de líneas para escribir en el archivo
+            List<String> lines = new ArrayList<>();
+
+            // Recorrer la lista y agregar las líneas de los objetos no null
+            for (DatosQuisckpass quisckpass : listaQuis) {
+                if (quisckpass != null) {
+                    String linea = "Codigo: " + quisckpass.getCodigo() + "; Placa: " + quisckpass.getPlaca()
+                            + "; Filial: " + quisckpass.getFilial() + " ; Estado: " + quisckpass.getEstado()
+                            + " ; Fecha: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date());
+                    lines.add(linea);  // Agregar la línea a la lista
+                }
+            }
+
+            // Verificar si se agregaron líneas
+            if (lines.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No hay datos para escribir.");
+                return;
+            }
+
+            // Escribir las líneas en el archivo
+            Files.write(archivo, lines, StandardOpenOption.CREATE);
+
+            // Mensaje de éxito
+            JOptionPane.showMessageDialog(null, "Archivo de datos generado exitosamente.");
+        } catch (IOException e) {
+            // Manejar la excepción en caso de error de escritura
+            JOptionPane.showMessageDialog(null, "Error al generar el archivo: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        // Verificar si se agregaron líneas
-        if (lines.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay datos para escribir.");
-            return;
-        }
-
-        // Escribir las líneas en el archivo
-        Files.write(archivo, lines, StandardOpenOption.CREATE);
-
-        // Mensaje de éxito
-        JOptionPane.showMessageDialog(null, "Archivo de datos generado exitosamente.");
     }
 }
