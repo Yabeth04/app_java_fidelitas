@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
  * @author samue
  */
 public class App_java_project {
+
     public static void main(String[] args) {
         // INICIO MAIN
         ControlCondominio CC = new ControlCondominio(5);
@@ -19,7 +20,7 @@ public class App_java_project {
             switch (indice) {
                 case 1 -> {
                     CC.AgregarQuis(new DatosQuisckpass());
-                } 
+                }
                 case 2 -> {
                     int indice2 = 0; //MENU SECUNDARIO
                     int indice3 = 0; //SUBMENU SECUNDARIO           
@@ -121,10 +122,52 @@ public class App_java_project {
                     }
                 }
                 case 5 -> {
-                    CC.GenerarTxt();
+                    int indice2 = Integer.parseInt(JOptionPane.showInputDialog("********* CONSULTAR ACCESOS *********\n"
+                            + "1) Registrar acceso\n"
+                            + "2) Consultar por filial\n"
+                            + "3) Consultar por fecha\n"
+                            + "4) Consultar por código o placa\n"
+                            + "5) Generar archivo de acceso\n"
+                            + "6) Salir"));
+
+                    switch (indice2) {
+                        case 1 -> {
+                            // Llamada al método de registrar acceso
+                            CC.registrarAcceso();  // Método para registrar un acceso (se debe definir este método)
+                        }
+                        case 2 -> {
+                            // Llamada al método para consultar por filial
+                            String filial = JOptionPane.showInputDialog("Ingrese la filial para la consulta:");
+                            CC.consultarPorFilial(filial); // Método para consultar por filial
+                        }
+                        case 3 -> {
+                            // Llamada al método para consultar por fecha
+                            String fechaInicio = JOptionPane.showInputDialog("Ingrese la fecha de inicio (dd/MM/yyyy HH:mm):");
+                            String fechaFin = JOptionPane.showInputDialog("Ingrese la fecha de fin (dd/MM/yyyy HH:mm):");
+                            CC.consultarPorFecha(fechaInicio, fechaFin); // Método para consultar por fecha
+                        }
+                        case 4 -> {
+                            // Llamada al método para consultar por código o placa
+                            String codigo = JOptionPane.showInputDialog("Ingrese el código o la placa:");
+                            CC.consultarPorCodigo(codigo); // Método para consultar por código
+                        }
+                        case 5 -> {
+                            // Llamada al método para generar un archivo de texto (opcional)
+                            CC.GenerarTxt(); // Método para generar un archivo de texto con los datos
+                        }
+                        case 6 -> {
+                            // Salir
+                            JOptionPane.showMessageDialog(null, "Saliendo del menú de consultas.");
+                        }
+                        default -> {
+                            JOptionPane.showMessageDialog(null, "ERROR: Opción no válida");
+                        }
+                    }
                 }
                 case 6 -> {
-                    /*SALIR*/ }
+                    /*SALIR*/
+
+                }
                 default ->
                     JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
             }//FIN SWITCH

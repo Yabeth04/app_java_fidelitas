@@ -33,6 +33,7 @@ public class App_java_project {
 }
 
 class ControlCondominio {
+
     private String[] historial;
     private int contador;
 
@@ -41,24 +42,30 @@ class ControlCondominio {
         contador = 0;
     }
 
-    // Registrar acceso en memoria (sin archivos)
     public void registrarAcceso() {
-        if (contador >= historial.length) {
-            JOptionPane.showMessageDialog(null, "Error: Capacidad máxima alcanzada.");
-            return;
+        try {
+            // Solicitar los datos al usuario
+            String codigo = JOptionPane.showInputDialog("Ingrese el código:");
+            String placa = JOptionPane.showInputDialog("Ingrese la placa:");
+            String filial = JOptionPane.showInputDialog("Ingrese la filial:");
+            String condicion = JOptionPane.showInputDialog("Ingrese la condición (Aceptado o Denegado):");
+
+            // Obtener la fecha y hora actual del sistema
+            String fecha = java.time.LocalDateTime.now().toString(); // Fecha y hora en formato ISO
+
+            // Formatear el registro
+            String registro = String.format("Codigo: %s; Placa: %s; Filial: %s; Condición: %s; Fecha: %s", codigo, placa, filial, condicion, fecha);
+
+            // Escribir el registro en el archivo Historial.txt
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("Historial.txt", true))) {
+                writer.write(registro);
+                writer.newLine();  // Añadir una nueva línea después de cada registro
+            }
+
+            JOptionPane.showMessageDialog(null, "Acceso registrado exitosamente.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al registrar acceso: " + e.getMessage());
         }
-
-        String codigo = JOptionPane.showInputDialog("Ingrese el código:");
-        String placa = JOptionPane.showInputDialog("Ingrese la placa:");
-        String filial = JOptionPane.showInputDialog("Ingrese la filial:");
-        String condicion = JOptionPane.showInputDialog("Ingrese la condición (Aceptado o Denegado):");
-
-        // Simulación de la fecha como texto fijo (ya que no podemos usar Date ni SimpleDateFormat)
-        String fecha = "15/05/2024 14:40"; 
-        String registro = String.format("Codigo: %s; Placa: %s; Filial: %s; Condición: %s; Fecha: %s", codigo, placa, filial, condicion, fecha);
-
-        historial[contador++] = registro;
-        JOptionPane.showMessageDialog(null, "Acceso registrado exitosamente.");
     }
 
     // Consultar por filial específica
@@ -68,7 +75,7 @@ class ControlCondominio {
 
         for (int i = 0; i < contador; i++) {
             if (historial[i].contains("Filial: " + filial)) {
-                resultado.append(historial[i]).append("\n");
+                resultado += historial[i] + "\n";
             }
         }
 

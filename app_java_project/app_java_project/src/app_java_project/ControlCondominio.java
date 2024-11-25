@@ -23,8 +23,6 @@ public class ControlCondominio {
         this.espacioEliminado = size;
     }
 
-
-
     public void AgregarQuis(DatosQuisckpass DQ) {
         if (espacio > 0) {
             for (int i = 0; i < listaQuis.length; i++) {
@@ -201,44 +199,104 @@ public class ControlCondominio {
         return "Rechazado"; // No se encontró el código en la lista
     }
 
-    public void GenerarTxt() {
-        try {
-            Path archivo = Paths.get("ListaQuisckpass.txt");
+    public void registrarAcceso() {
+        // Datos de acceso (simulados, puedes modificar según lo que necesites)
+        String codigo = JOptionPane.showInputDialog("Ingrese el código:");
+        String placa = JOptionPane.showInputDialog("Ingrese la placa:");
+        String filial = JOptionPane.showInputDialog("Ingrese la filial:");
+        String condicion = JOptionPane.showInputDialog("Ingrese la condición:");
 
-            // Validar si la lista es null o está vacía
-            if (listaQuis == null || listaQuis.length == 0) {
-                JOptionPane.showMessageDialog(null, "Lista vacía.");
-                return;  // Salir si la lista está vacía o es null
-            }
+        // Obtener la fecha y hora actuales
+        String fechaHora = java.time.LocalDateTime.now().toString();
 
-            // Crear una lista de líneas para escribir en el archivo
-            List<String> lines = new ArrayList<>();
+        // Crear el texto para guardar en el archivo
+        String logEntry = String.format("Codigo: %s; Placa: %s; Filial: %s; Condición: %s; Fecha: %s\n",
+                codigo, placa, filial, condicion, fechaHora);
 
-            // Recorrer la lista y agregar las líneas de los objetos no null
-            for (DatosQuisckpass quisckpass : listaQuis) {
-                if (quisckpass != null) {
-                    String linea = "Codigo: " + quisckpass.getCodigo() + "; Placa: " + quisckpass.getPlaca()
-                            + "; Filial: " + quisckpass.getFilial() + " ; Estado: " + quisckpass.getEstado()
-                            + " ; Fecha: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date());
-                    lines.add(linea);  // Agregar la línea a la lista
+        // Guardar en el archivo "Historial.txt"
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Historial.txt", true))) {
+            writer.write(logEntry);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al registrar el acceso: " + e.getMessage());
+        }
+    }
+
+    public void consultarPorFilial(String filial) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
+            String line;
+            boolean found = false;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("Filial: " + filial)) {
+                    JOptionPane.showMessageDialog(null, line);
+                    found = true;
                 }
             }
 
-            // Verificar si se agregaron líneas
-            if (lines.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "No hay datos para escribir.");
-                return;
+            if (!found) {
+                JOptionPane.showMessageDialog(null, "No se encontraron accesos para la filial: " + filial);
             }
-
-            // Escribir las líneas en el archivo
-            Files.write(archivo, lines, StandardOpenOption.CREATE);
-
-            // Mensaje de éxito
-            JOptionPane.showMessageDialog(null, "Archivo de datos generado exitosamente.");
         } catch (IOException e) {
-            // Manejar la excepción en caso de error de escritura
-            JOptionPane.showMessageDialog(null, "Error al generar el archivo: " + e.getMessage());
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
         }
     }
+
+    public void consultarPorFecha(String fechaInicio, String fechaFin) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
+            String line;
+            boolean found = false;
+
+            while ((line = reader.readLine()) != null) {
+                String fecha = line.split("Fecha: ")[1].split(" ")[0]; // Extrae la fecha
+                if (fecha.compareTo(fechaInicio) >= 0 && fecha.compareTo(fechaFin) <= 0) {
+                    JOptionPane.showMessageDialog(null, line);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                JOptionPane.showMessageDialog(null, "No se encontraron accesos en el rango de fechas.");
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
+        }
+    }
+
+    public void consultarPorCodigo(String codigo) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
+            String line;
+            boolean found = false;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("Codigo: " + codigo) || line.contains("Placa: " + codigo)) {
+                    JOptionPane.showMessageDialog(null, line);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                JOptionPane.showMessageDialog(null, "No se encontraron accesos para el código o placa: " + codigo);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
+        }
+    }
+
+    public void GenerarTxt() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
+            String line;
+            String contenido = ""; // Cadena inicial vacía
+            while ((line = reader.readLine()) != null) {
+                contenido += line + "\n"; // Concatenación directa con el operador "+"
+            }
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("HistorialCompleto.txt"))) {
+                writer.write(contenido); // Escribimos directamente la cadena concatenada
+            }
+
+            JOptionPane.showMessageDialog(null, "Archivo generado correctamente: HistorialCompleto.txt");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al generar el archivo: " + e.getMessage());
+        }
+    }
+
 }

@@ -1,2 +1,0 @@
-Codigo: 1012222222; Placa: 2; Filial: 2 ; Estado: Inactivo ; Fecha: 16/11/2024 17:42
-Codigo: 1013333333; Placa: 3; Filial: 3 ; Estado: Activo ; Fecha: 16/11/2024 17:42
