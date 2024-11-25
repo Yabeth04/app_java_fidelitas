@@ -1,2 +1,0 @@
-Codigo: 1; Placa: 1; Filial: 1; Condición: activo; Fecha: 2024-11-24T22:05:37.823856800
-Codigo: 2; Placa: 101; Filial: 1; Condición: 1; Fecha: 2024-11-24T22:09:28.077226300
