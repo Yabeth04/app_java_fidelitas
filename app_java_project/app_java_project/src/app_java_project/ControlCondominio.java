@@ -204,7 +204,16 @@ public class ControlCondominio {
         String codigo = JOptionPane.showInputDialog("Ingrese el código:");
         String placa = JOptionPane.showInputDialog("Ingrese la placa:");
         String filial = JOptionPane.showInputDialog("Ingrese la filial:");
-        String condicion = JOptionPane.showInputDialog("Ingrese la condición:");
+        int optionCondition = Integer.parseInt(JOptionPane.showInputDialog("1) Aceptado\n 2) Rechazado\n\nIngrese la opcion de la condicion: "));
+        String condicion = "";
+        switch (optionCondition) {
+            case 1 ->
+                condicion = "Aceptado";
+            case 2 ->
+                condicion = "Rechazado";
+            default ->
+                JOptionPane.showMessageDialog(null, "Opción inválida. Se usará 'Rechazado'.");
+        }
 
         // Obtener la fecha y hora actuales
         String fechaHora = java.time.LocalDateTime.now().toString();
@@ -222,12 +231,15 @@ public class ControlCondominio {
     }
 
     public void consultarPorFilial(String filial) {
+        boolean found = false;
+
+        // Usamos try-with-resources para abrir y cerrar automáticamente el archivo
         try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
             String line;
-            boolean found = false;
 
             while ((line = reader.readLine()) != null) {
-                if (line.contains("Filial: " + filial)) {
+                // Verifica si la línea tiene la palabra "Filial: " y la filial proporcionada
+                if (line.length() > 7 && line.substring(0, 7).equals("Filial:") && line.substring(7, 7 + filial.length()).equals(filial)) {
                     JOptionPane.showMessageDialog(null, line);
                     found = true;
                 }
@@ -241,34 +253,94 @@ public class ControlCondominio {
         }
     }
 
-    public void consultarPorFecha(String fechaInicio, String fechaFin) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
-            String line;
-            boolean found = false;
+    public void consultarPorFecha() {
+        // Pedir al usuario el día, mes y año para las fechas de inicio y fin
+        int diaInicio = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el día de inicio:"));
+        int mesInicio = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el mes de inicio:"));
+        int añoInicio = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el año de inicio:"));
 
+        int diaFin = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el día de fin:"));
+        int mesFin = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el mes de fin:"));
+        int añoFin = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el año de fin:"));
+
+        // Convertir las fechas a un formato simple "yyyyMMdd" para facilitar la comparación
+        String fechaInicio = String.format("%04d%02d%02d", añoInicio, mesInicio, diaInicio);
+        String fechaFin = String.format("%04d%02d%02d", añoFin, mesFin, diaFin);
+
+        BufferedReader reader = null;
+        String line;
+        boolean found = false;
+
+        try {
+            // Abrir el archivo para lectura
+            reader = new BufferedReader(new FileReader("Historial.txt"));
+
+            // Leer cada línea del archivo
             while ((line = reader.readLine()) != null) {
-                String fecha = line.split("Fecha: ")[1].split(" ")[0]; // Extrae la fecha
-                if (fecha.compareTo(fechaInicio) >= 0 && fecha.compareTo(fechaFin) <= 0) {
-                    JOptionPane.showMessageDialog(null, line);
-                    found = true;
+                // Verificar si la línea tiene al menos 17 caracteres y si la subcadena "Fecha:" está en la posición correcta
+                if (line.length() >= 17 && line.substring(0, 6).equals("Fecha:")) {
+                    // Extraer la fecha de la línea (formato: yyyy-MM-dd)
+                    String fecha = line.substring(7, 17);  // "yyyy-MM-dd"
+
+                    // Comparar las fechas manualmente sin usar replace
+                    if (esFechaValida(fecha, fechaInicio) && esFechaValida(fecha, fechaFin)) {
+                        JOptionPane.showMessageDialog(null, line);
+                        found = true;
+                    }
                 }
             }
 
+            // Si no se encontraron accesos en el rango de fechas
             if (!found) {
                 JOptionPane.showMessageDialog(null, "No se encontraron accesos en el rango de fechas.");
             }
         } catch (IOException e) {
+            // Capturar cualquier error al abrir o leer el archivo
             JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
         }
     }
 
+    private boolean esFechaValida(String fechaComparar, String fechaReferencia) {
+        // Comparar año
+        int añoComparar = Integer.parseInt(fechaComparar.substring(0, 4));
+        int añoReferencia = Integer.parseInt(fechaReferencia.substring(0, 4));
+        if (añoComparar < añoReferencia) {
+            return false;
+        }
+        if (añoComparar > añoReferencia) {
+            return true;
+        }
+
+        // Comparar mes
+        int mesComparar = Integer.parseInt(fechaComparar.substring(5, 7));
+        int mesReferencia = Integer.parseInt(fechaReferencia.substring(5, 7));
+        if (mesComparar < mesReferencia) {
+            return false;
+        }
+        if (mesComparar > mesReferencia) {
+            return true;
+        }
+
+        // Comparar día
+        int diaComparar = Integer.parseInt(fechaComparar.substring(8, 10));
+        int diaReferencia = Integer.parseInt(fechaReferencia.substring(8, 10));
+        return diaComparar >= diaReferencia;
+    }
+
     public void consultarPorCodigo(String codigo) {
+        boolean found = false;
+
+        // Usamos try-with-resources para abrir y cerrar automáticamente el archivo
         try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
             String line;
-            boolean found = false;
 
             while ((line = reader.readLine()) != null) {
-                if (line.contains("Codigo: " + codigo) || line.contains("Placa: " + codigo)) {
+                // Comprobar si la línea contiene "Codigo: " y el código o "Placa: " y el código
+                // Verificar que la línea tiene al menos 7 caracteres y comparar la subcadena "Codigo:" o "Placa:" con el código
+                if (line.length() > 7 && line.substring(0, 7).equals("Codigo:") && line.substring(7, 7 + codigo.length()).equals(codigo)) {
+                    JOptionPane.showMessageDialog(null, line);
+                    found = true;
+                } else if (line.length() > 7 && line.substring(0, 7).equals("Placa:") && line.substring(7, 7 + codigo.length()).equals(codigo)) {
                     JOptionPane.showMessageDialog(null, line);
                     found = true;
                 }
@@ -287,10 +359,10 @@ public class ControlCondominio {
             String line;
             String contenido = ""; // Cadena inicial vacía
             while ((line = reader.readLine()) != null) {
-                contenido += line + "\n"; // Concatenación directa con el operador "+"
+                contenido += line + "\n"; // Concatenación directa
             }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("HistorialCompleto.txt"))) {
-                writer.write(contenido); // Escribimos directamente la cadena concatenada
+                writer.write(contenido);
             }
 
             JOptionPane.showMessageDialog(null, "Archivo generado correctamente: HistorialCompleto.txt");
@@ -298,5 +370,4 @@ public class ControlCondominio {
             JOptionPane.showMessageDialog(null, "Error al generar el archivo: " + e.getMessage());
         }
     }
-
 }

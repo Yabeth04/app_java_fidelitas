@@ -133,7 +133,7 @@ public class App_java_project {
                     switch (indice2) {
                         case 1 -> {
                             // Llamada al método de registrar acceso
-                            CC.registrarAcceso();  // Método para registrar un acceso (se debe definir este método)
+                            CC.registrarAcceso();
                         }
                         case 2 -> {
                             // Llamada al método para consultar por filial
@@ -141,10 +141,7 @@ public class App_java_project {
                             CC.consultarPorFilial(filial); // Método para consultar por filial
                         }
                         case 3 -> {
-                            // Llamada al método para consultar por fecha
-                            String fechaInicio = JOptionPane.showInputDialog("Ingrese la fecha de inicio (dd/MM/yyyy HH:mm):");
-                            String fechaFin = JOptionPane.showInputDialog("Ingrese la fecha de fin (dd/MM/yyyy HH:mm):");
-                            CC.consultarPorFecha(fechaInicio, fechaFin); // Método para consultar por fecha
+                            CC.consultarPorFecha(); // Método para consultar por fecha
                         }
                         case 4 -> {
                             // Llamada al método para consultar por código o placa
