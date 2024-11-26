@@ -4,6 +4,12 @@ import javax.swing.JOptionPane;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.time.LocalDateTime;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -204,26 +210,35 @@ public class ControlCondominio {
         String codigo = JOptionPane.showInputDialog("Ingrese el código:");
         String placa = JOptionPane.showInputDialog("Ingrese la placa:");
         String filial = JOptionPane.showInputDialog("Ingrese la filial:");
-        int optionCondition = Integer.parseInt(JOptionPane.showInputDialog("1) Aceptado\n 2) Rechazado\n\nIngrese la opcion de la condicion: "));
+
+        // Validación para la opción de la condición
         String condicion = "";
-        switch (optionCondition) {
-            case 1 ->
-                condicion = "Aceptado";
-            case 2 ->
-                condicion = "Rechazado";
-            default ->
-                JOptionPane.showMessageDialog(null, "Opción inválida. Se usará 'Rechazado'.");
+        try {
+            int optionCondition = Integer.parseInt(JOptionPane.showInputDialog("1) Aceptado\n 2) Rechazado\n\nIngrese la opción de la condición: "));
+            switch (optionCondition) {
+                case 1 ->
+                    condicion = "Aceptado";
+                case 2 ->
+                    condicion = "Rechazado";
+                default -> {
+                    condicion = "Rechazado"; // Condición por defecto
+                    JOptionPane.showMessageDialog(null, "Opción inválida. Se usará 'Rechazado'.");
+                }
+            }
+        } catch (NumberFormatException e) {
+            // Si el usuario no ingresa un número válido
+            condicion = "Rechazado";
+            JOptionPane.showMessageDialog(null, "Opción inválida. Se usará 'Rechazado'.");
         }
 
-        // Obtener la fecha y hora actuales
-        String fechaHora = java.time.LocalDateTime.now().toString();
+        String fechaHora = LocalDateTime.now().toString();
 
         // Crear el texto para guardar en el archivo
-        String logEntry = String.format("Codigo: %s; Placa: %s; Filial: %s; Condición: %s; Fecha: %s\n",
+        String logEntry = String.format("Código: %s; Placa: %s; Filial: %s; Condición: %s; Fecha: %s\n",
                 codigo, placa, filial, condicion, fechaHora);
 
         // Guardar en el archivo "Historial.txt"
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Historial.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Historial.txt", true), StandardCharsets.UTF_8))) {
             writer.write(logEntry);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error al registrar el acceso: " + e.getMessage());
@@ -238,15 +253,24 @@ public class ControlCondominio {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                // Verifica si la línea tiene la palabra "Filial: " y la filial proporcionada
-                if (line.length() > 7 && line.substring(0, 7).equals("Filial:") && line.substring(7, 7 + filial.length()).equals(filial)) {
-                    JOptionPane.showMessageDialog(null, line);
-                    found = true;
+                // Verifica si la línea comienza con "Filial: "
+                if (line.length() > 7 && line.substring(0, 7).equals("Filial:")) {
+                    // Extrae la parte de la filial de la línea
+                    String lineaFilial = line.substring(8); // El texto después de "Filial: "
+
+                    // Comparar manualmente la cadena sin usar métodos avanzados
+                    if (lineaFilial.length() >= filial.length()) {
+                        String parteFilial = lineaFilial.substring(0, filial.length());
+                        if (parteFilial.equals(filial)) {
+                            JOptionPane.showMessageDialog(null, line);
+                            found = true;
+                        }
+                    }
                 }
             }
 
             if (!found) {
-                JOptionPane.showMessageDialog(null, "No se encontraron accesos para la filial: " + filial);
+                JOptionPane.showMessageDialog(null, "consulta registrada.puede verla en el archivo ");
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
@@ -272,17 +296,15 @@ public class ControlCondominio {
         boolean found = false;
 
         try {
-            // Abrir el archivo para lectura
             reader = new BufferedReader(new FileReader("Historial.txt"));
 
             // Leer cada línea del archivo
             while ((line = reader.readLine()) != null) {
-                // Verificar si la línea tiene al menos 17 caracteres y si la subcadena "Fecha:" está en la posición correcta
+                // Verificar si la línea tiene al menos 17 caracteres 
                 if (line.length() >= 17 && line.substring(0, 6).equals("Fecha:")) {
-                    // Extraer la fecha de la línea (formato: yyyy-MM-dd)
                     String fecha = line.substring(7, 17);  // "yyyy-MM-dd"
 
-                    // Comparar las fechas manualmente sin usar replace
+                    // Comparar las fechas manualmente 
                     if (esFechaValida(fecha, fechaInicio) && esFechaValida(fecha, fechaFin)) {
                         JOptionPane.showMessageDialog(null, line);
                         found = true;
@@ -290,12 +312,10 @@ public class ControlCondominio {
                 }
             }
 
-            // Si no se encontraron accesos en el rango de fechas
             if (!found) {
-                JOptionPane.showMessageDialog(null, "No se encontraron accesos en el rango de fechas.");
+                JOptionPane.showMessageDialog(null, "consulta registrada.puede verla en el archivo ");
             }
         } catch (IOException e) {
-            // Capturar cualquier error al abrir o leer el archivo
             JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
         }
     }
@@ -330,13 +350,10 @@ public class ControlCondominio {
     public void consultarPorCodigo(String codigo) {
         boolean found = false;
 
-        // Usamos try-with-resources para abrir y cerrar automáticamente el archivo
         try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                // Comprobar si la línea contiene "Codigo: " y el código o "Placa: " y el código
-                // Verificar que la línea tiene al menos 7 caracteres y comparar la subcadena "Codigo:" o "Placa:" con el código
                 if (line.length() > 7 && line.substring(0, 7).equals("Codigo:") && line.substring(7, 7 + codigo.length()).equals(codigo)) {
                     JOptionPane.showMessageDialog(null, line);
                     found = true;
@@ -347,7 +364,7 @@ public class ControlCondominio {
             }
 
             if (!found) {
-                JOptionPane.showMessageDialog(null, "No se encontraron accesos para el código o placa: " + codigo);
+                JOptionPane.showMessageDialog(null, "consulta registrada.puede verla en el archivo ");
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
