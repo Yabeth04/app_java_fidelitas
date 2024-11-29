@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.io.BufferedWriter;
+import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -19,6 +20,7 @@ public class ControlCondominio {
 
     private DatosQuisckpass listaQuis[];
     private DatosQuisckpass listaQuisEliminados[];
+    private List<String> listaBitacora;
     private int espacio;
     private int espacioEliminado;
 
@@ -27,6 +29,7 @@ public class ControlCondominio {
         this.listaQuis = new DatosQuisckpass[size];
         this.espacio = size;
         this.espacioEliminado = size;
+        listaBitacora = new ArrayList<>();
     }
 
     public void AgregarQuis(DatosQuisckpass DQ) {
@@ -192,9 +195,12 @@ public class ControlCondominio {
     }
 
     public String consultaCod(String pCodigo) {
+        if (listaQuis.length == espacio) { // La lista está vacía
+            return "Rechazado (la lista está vacía)";
+        }
+
         for (DatosQuisckpass quisckpass : listaQuis) {
             if (quisckpass != null && quisckpass.getCodigo().equals(pCodigo)) {
-                // Si existe y su estado es activo, es aceptado
                 if (quisckpass.getEstado() == Estado.Activo) {
                     return "Aceptado";
                 } else {
@@ -202,189 +208,81 @@ public class ControlCondominio {
                 }
             }
         }
+
         return "Rechazado"; // No se encontró el código en la lista
     }
 
-    public void registrarAcceso() {
-        // Datos de acceso (simulados, puedes modificar según lo que necesites)
-        String codigo = JOptionPane.showInputDialog("Ingrese el código:");
-        String placa = JOptionPane.showInputDialog("Ingrese la placa:");
-        String filial = JOptionPane.showInputDialog("Ingrese la filial:");
+    private static final String ARCHIVO_QUICKPASS = "quickpasses.txt"; // archivo donde se guardan los quickpasses
 
-        // Validación para la opción de la condición
-        String condicion = "";
-        try {
-            int optionCondition = Integer.parseInt(JOptionPane.showInputDialog("1) Aceptado\n 2) Rechazado\n\nIngrese la opción de la condición: "));
-            switch (optionCondition) {
-                case 1 ->
-                    condicion = "Aceptado";
-                case 2 ->
-                    condicion = "Rechazado";
-                default -> {
-                    condicion = "Rechazado"; // Condición por defecto
-                    JOptionPane.showMessageDialog(null, "Opción inválida. Se usará 'Rechazado'.");
-                }
+    public void registrar() {
+        // Leer los datos del Quickpass
+        String codigo = JOptionPane.showInputDialog("Ingrese el código del Quickpass:");
+        String descripcion = JOptionPane.showInputDialog("Ingrese la descripción del Quickpass:");
+
+        // Buscar el Quickpass en la listaQuickpass
+        DatosQuisckpass quickpassExistente = buscarQuickpassEnLista(codigo);
+
+        if (quickpassExistente != null && quickpassExistente.getEstado().equals("Activo")) {
+            // Si el Quickpass está en la lista y está activo
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("quickpasses.txt", true))) {
+                writer.write(codigo + "|" + "activo" + "|" + descripcion);
+                writer.newLine();
+                JOptionPane.showMessageDialog(null, "Quickpass registrado exitosamente.");
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al registrar el Quickpass.");
             }
-        } catch (NumberFormatException e) {
-            // Si el usuario no ingresa un número válido
-            condicion = "Rechazado";
-            JOptionPane.showMessageDialog(null, "Opción inválida. Se usará 'Rechazado'.");
-        }
-
-        String fechaHora = LocalDateTime.now().toString();
-
-        // Crear el texto para guardar en el archivo
-        String logEntry = String.format("Código: %s; Placa: %s; Filial: %s; Condición: %s; Fecha: %s\n",
-                codigo, placa, filial, condicion, fechaHora);
-
-        // Guardar en el archivo "Historial.txt"
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Historial.txt", true), StandardCharsets.UTF_8))) {
-            writer.write(logEntry);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al registrar el acceso: " + e.getMessage());
+        } else {
+            // Si el Quickpass no está en la lista o no está activo
+            JOptionPane.showMessageDialog(null, "El Quickpass no está registrado o no está activo.");
         }
     }
 
-    public void consultarPorFilial(String filial) {
-        boolean found = false;
+    private DatosQuisckpass buscarQuickpassEnLista(String codigo) {
+        for (DatosQuisckpass quickpass : listaQuis) {
+            if (quickpass != null) {
+                System.out.println("Comparando " + codigo + " con " + quickpass.getCodigo());
+                try {
+                    int codigoQuickpass = Integer.parseInt(quickpass.getCodigo());
+                    int codigoIngresado = Integer.parseInt(codigo);
 
-        // Usamos try-with-resources para abrir y cerrar automáticamente el archivo
-        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                // Verifica si la línea comienza con "Filial: "
-                if (line.length() > 7 && line.substring(0, 7).equals("Filial:")) {
-                    // Extrae la parte de la filial de la línea
-                    String lineaFilial = line.substring(8); // El texto después de "Filial: "
-
-                    // Comparar manualmente la cadena sin usar métodos avanzados
-                    if (lineaFilial.length() >= filial.length()) {
-                        String parteFilial = lineaFilial.substring(0, filial.length());
-                        if (parteFilial.equals(filial)) {
-                            JOptionPane.showMessageDialog(null, line);
-                            found = true;
-                        }
+                    if (codigoQuickpass == codigoIngresado) {
+                        return quickpass; // Retorna el Quickpass si los códigos coinciden
                     }
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: El código no es un número válido.");
                 }
             }
-
-            if (!found) {
-                JOptionPane.showMessageDialog(null, "consulta registrada.puede verla en el archivo ");
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
         }
+        return null; // Si no lo encuentra
     }
 
-    public void consultarPorFecha() {
-        // Pedir al usuario el día, mes y año para las fechas de inicio y fin
-        int diaInicio = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el día de inicio:"));
-        int mesInicio = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el mes de inicio:"));
-        int añoInicio = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el año de inicio:"));
-
-        int diaFin = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el día de fin:"));
-        int mesFin = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el mes de fin:"));
-        int añoFin = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el año de fin:"));
-
-        // Convertir las fechas a un formato simple "yyyyMMdd" para facilitar la comparación
-        String fechaInicio = String.format("%04d%02d%02d", añoInicio, mesInicio, diaInicio);
-        String fechaFin = String.format("%04d%02d%02d", añoFin, mesFin, diaFin);
-
-        BufferedReader reader = null;
-        String line;
-        boolean found = false;
+    public void consultaFilial() {
+        String filial = JOptionPane.showInputDialog("Ingrese la filial para buscar:");
 
         try {
-            reader = new BufferedReader(new FileReader("Historial.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader(ARCHIVO_QUICKPASS));
+            String line;
+            boolean encontrado = false;
 
-            // Leer cada línea del archivo
             while ((line = reader.readLine()) != null) {
-                // Verificar si la línea tiene al menos 17 caracteres 
-                if (line.length() >= 17 && line.substring(0, 6).equals("Fecha:")) {
-                    String fecha = line.substring(7, 17);  // "yyyy-MM-dd"
+                String[] partes = line.split("\\|");
 
-                    // Comparar las fechas manualmente 
-                    if (esFechaValida(fecha, fechaInicio) && esFechaValida(fecha, fechaFin)) {
-                        JOptionPane.showMessageDialog(null, line);
-                        found = true;
-                    }
+                // Verificar si el código corresponde y si el Quickpass está activo
+                if (partes[0].equals(filial) && partes[1].equals("activo")) {
+                    JOptionPane.showMessageDialog(null, "Quickpass encontrado: " + partes[2]); // Mostrar descripción
+                    encontrado = true;
+                    break;
                 }
             }
 
-            if (!found) {
-                JOptionPane.showMessageDialog(null, "consulta registrada.puede verla en el archivo ");
+            if (!encontrado) {
+                JOptionPane.showMessageDialog(null, "No se encontró el Quickpass o está inactivo.");
             }
+
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
-        }
-    }
-
-    private boolean esFechaValida(String fechaComparar, String fechaReferencia) {
-        // Comparar año
-        int añoComparar = Integer.parseInt(fechaComparar.substring(0, 4));
-        int añoReferencia = Integer.parseInt(fechaReferencia.substring(0, 4));
-        if (añoComparar < añoReferencia) {
-            return false;
-        }
-        if (añoComparar > añoReferencia) {
-            return true;
-        }
-
-        // Comparar mes
-        int mesComparar = Integer.parseInt(fechaComparar.substring(5, 7));
-        int mesReferencia = Integer.parseInt(fechaReferencia.substring(5, 7));
-        if (mesComparar < mesReferencia) {
-            return false;
-        }
-        if (mesComparar > mesReferencia) {
-            return true;
-        }
-
-        // Comparar día
-        int diaComparar = Integer.parseInt(fechaComparar.substring(8, 10));
-        int diaReferencia = Integer.parseInt(fechaReferencia.substring(8, 10));
-        return diaComparar >= diaReferencia;
-    }
-
-    public void consultarPorCodigo(String codigo) {
-        boolean found = false;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.length() > 7 && line.substring(0, 7).equals("Codigo:") && line.substring(7, 7 + codigo.length()).equals(codigo)) {
-                    JOptionPane.showMessageDialog(null, line);
-                    found = true;
-                } else if (line.length() > 7 && line.substring(0, 7).equals("Placa:") && line.substring(7, 7 + codigo.length()).equals(codigo)) {
-                    JOptionPane.showMessageDialog(null, line);
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                JOptionPane.showMessageDialog(null, "consulta registrada.puede verla en el archivo ");
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al consultar el historial: " + e.getMessage());
-        }
-    }
-
-    public void GenerarTxt() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("Historial.txt"))) {
-            String line;
-            String contenido = ""; // Cadena inicial vacía
-            while ((line = reader.readLine()) != null) {
-                contenido += line + "\n"; // Concatenación directa
-            }
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("HistorialCompleto.txt"))) {
-                writer.write(contenido);
-            }
-
-            JOptionPane.showMessageDialog(null, "Archivo generado correctamente: HistorialCompleto.txt");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al generar el archivo: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al leer el archivo.");
         }
     }
 }
