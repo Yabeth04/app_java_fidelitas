@@ -21,7 +21,6 @@ public class ControlCondominio {
 
     private DatosQuisckpass listaQuis[];
     private DatosQuisckpass listaQuisEliminados[];
-    private List<String> listaBitacora;
     private int espacio;
     private int espacioEliminado;
 
@@ -30,7 +29,6 @@ public class ControlCondominio {
         this.listaQuis = new DatosQuisckpass[size];
         this.espacio = size;
         this.espacioEliminado = size;
-        listaBitacora = new ArrayList<>();
     }
 
     public void AgregarQuis(DatosQuisckpass DQ) {
@@ -212,8 +210,6 @@ public class ControlCondominio {
 
         return "Rechazado"; // No se encontró el código en la lista
     }
-
-    private static final String ARCHIVO_QUICKPASS = "quickpasses.txt"; // archivo donde se guardan los quickpasses
 
     public void registrar() {
         String codigo = JOptionPane.showInputDialog("Ingrese el código del Quickpass:");
@@ -425,4 +421,76 @@ public class ControlCondominio {
         }
     }
 
+    public int obtenerTotalAccesos() {
+        int totalAccesos = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader("Historial.txt"))) {
+            while (br.readLine() != null) {
+                totalAccesos++;
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al leer el archivo de historial: " + e.getMessage());
+        }
+        return totalAccesos;
+    }
+
+    public String obtenerAccesosPorFilial() {
+        Map<String, Integer> accesosPorFilial = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("Historial.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                if (linea.contains("Filial: ")) {
+                    String filial = linea.split(";")[2].split(":")[1].trim();
+                    accesosPorFilial.put(filial, accesosPorFilial.getOrDefault(filial, 0) + 1);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al leer el archivo de historial: " + e.getMessage());
+        }
+
+        StringBuilder resultado = new StringBuilder("Accesos por filial:\n");
+        for (Map.Entry<String, Integer> entry : accesosPorFilial.entrySet()) {
+            resultado.append("Filial ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        return resultado.toString();
+    }
+
+    public int obtenerTotalQuickpass() {
+        int totalRegistrados = 0;
+        for (DatosQuisckpass quisckpass : listaQuis) {
+            if (quisckpass != null) {
+                totalRegistrados++;
+            }
+        }
+        return totalRegistrados;
+    }
+
+    public int obtenerQuickpassActivos() {
+        int activos = 0;
+        for (DatosQuisckpass quisckpass : listaQuis) {
+            if (quisckpass != null && quisckpass.getEstado() == Estado.Activo) {
+                activos++;
+            }
+        }
+        return activos;
+    }
+
+    public int obtenerQuickpassInactivos() {
+        int inactivos = 0;
+        for (DatosQuisckpass quisckpass : listaQuis) {
+            if (quisckpass != null && quisckpass.getEstado() == Estado.Inactivo) {
+                inactivos++;
+            }
+        }
+        return inactivos;
+    }
+
+    public int obtenerTotalQuickpassEliminados() {
+        int totalEliminados = 0;
+        for (DatosQuisckpass quisckpass : listaQuisEliminados) {
+            if (quisckpass != null) {
+                totalEliminados++;
+            }
+        }
+        return totalEliminados;
+    }
 }

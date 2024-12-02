@@ -11,13 +11,12 @@ public class App_java_project {
     public static void main(String[] args) {
         // INICIO MAIN
         ControlCondominio CC = new ControlCondominio(5);
-        App_java_project cc = new App_java_project();
 
         int indice = 0;
 
         do {
             indice = Integer.parseInt(JOptionPane.showInputDialog("********* MENU *********\n"
-                    + "1) Agregar\n2) Visualizar\n3) Eliminar\n4) Cambiar Estado\n5) Consultar\n6) Registrar Accesos\n7) Salir"));
+                    + "1) Agregar\n2) Visualizar\n3) Eliminar\n4) Cambiar Estado\n5) Consultar\n6) Registrar Accesos\n7) Reportes \n8) Salir\n\n Seleccione una opción:"));
 
             switch (indice) {
                 case 1 -> {
@@ -176,13 +175,38 @@ public class App_java_project {
                     } while (opcionBitacora != 3);
                 }
                 case 7 -> {
+                    // Reportes
+                    int opcionReporte;
+                    do {
+                        opcionReporte = Integer.parseInt(JOptionPane.showInputDialog("****** REPORTES ******\n"
+                                + "1) Total de accesos registrados\n"
+                                + "2) Total de accesos por filial\n"
+                                + "3) Total de QuickPass registrados\n"
+                                + "4) Total de QuickPass activos e inactivos\n"
+                                + "5) Total de QuickPass eliminados\n"
+                                + "6) Salir"));
+
+                        switch (opcionReporte) {
+                            case 1 -> JOptionPane.showMessageDialog(null, "Total de accesos registrados: " + CC.obtenerTotalAccesos());
+                            case 2 -> JOptionPane.showMessageDialog(null, CC.obtenerAccesosPorFilial());
+                            case 3 -> JOptionPane.showMessageDialog(null, "Total de QuickPass registrados: " + CC.obtenerTotalQuickpass());
+                            case 4 -> JOptionPane.showMessageDialog(null, "QuickPass Activos: " + CC.obtenerQuickpassActivos() 
+                                    + "\nQuickPass Inactivos: " + CC.obtenerQuickpassInactivos());
+                            case 5 -> JOptionPane.showMessageDialog(null, "Total de QuickPass eliminados: " + CC.obtenerTotalQuickpassEliminados());
+                            case 6 -> {
+                                // Salir del menú de reportes
+                            }
+                            default -> JOptionPane.showMessageDialog(null, "ERROR: Opción no válida");
+                        }
+                    } while (opcionReporte != 6);
+                }
+                case 8 -> {
                     // Salir del programa
-                    System.exit(0);
                 }
                 default ->
                     JOptionPane.showMessageDialog(null, "ERROR: Opcion no valida");
             }
-        } while (indice != 7);
+        } while (indice != 8);
     }
 
 }
