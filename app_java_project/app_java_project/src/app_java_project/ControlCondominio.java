@@ -218,21 +218,26 @@ public class ControlCondominio {
         DatosQuisckpass quickpassExistente = buscarQuickpassEnLista(codigo);
 
         if (quickpassExistente != null) {
-            // Si el Quickpass existe, registra el acceso sin importar su estado
-            String estado = quickpassExistente.getEstado() == Estado.Activo ? "Activo" : "Inactivo";
+            // verifica si el Quickpass está activo
+            if (quickpassExistente.getEstado() == Estado.Activo) {
+                String estado = "Activo"; //
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("quickpasses.txt", true))) {
-                writer.write(codigo + "|" + estado); 
-                writer.newLine();
-                JOptionPane.showMessageDialog(null, "Quickpass registrado exitosamente.");
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("quickpasses.txt", true))) {
+                    writer.write(codigo + "|" + estado);
+                    writer.newLine();
+                    JOptionPane.showMessageDialog(null, "Quickpass registrado exitosamente.");
 
-                // Registrar en el historial
-                String placa = quickpassExistente.getPlaca(); // obtener la placa desde el objeto
-                String filial = quickpassExistente.getFilial(); // obtneer la filial desde el objeto
-                registrarEnHistorial(codigo, placa, filial, estado);
-            } catch (IOException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error al registrar el Quickpass.");
+                    // Registrar en el historial
+                    String placa = quickpassExistente.getPlaca(); // obtener la placa desde el objeto
+                    String filial = quickpassExistente.getFilial(); // obtener la filial desde el objeto
+                    registrarEnHistorial(codigo, placa, filial, estado);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al registrar el Quickpass.");
+                }
+            } else {
+                // Si el Quickpass no está activo
+                JOptionPane.showMessageDialog(null, "El Quickpass está inactivo y no puede ser registrado.");
             }
         } else {
             // Si el Quickpass no está en la lista
@@ -393,7 +398,8 @@ public class ControlCondominio {
     public void consultarPorPlaca() {
         String placaBuscada = JOptionPane.showInputDialog("Ingrese la placa del vehículo que desea consultar:");
 
-        if (placaBuscada == null || placaBuscada.isEmpty()) {
+        //if (placaBuscada == null || placaBuscada.isEmpty()) {
+        if (placaBuscada == null || placaBuscada.trim().length() == 0) {
             JOptionPane.showMessageDialog(null, "Debe ingresar una placa válida.");
             return;
         }

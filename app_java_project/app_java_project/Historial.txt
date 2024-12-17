@@ -1,0 +1,3 @@
+Código: 1011111111; Placa: 1; Filial: 1; Condición: Activo; Fecha: 16/12/2024 18:35
+Código: 1012222222; Placa: 2; Filial: 2; Condición: Activo; Fecha: 16/12/2024 18:53
+Código: 1012222222; Placa: 2; Filial: 2; Condición: Inactivo; Fecha: 16/12/2024 18:53
